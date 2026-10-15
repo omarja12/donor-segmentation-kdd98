@@ -1,0 +1,25 @@
+name: run
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Execute the notebook top to bottom
+        run: jupyter nbconvert --to notebook --execute donor_segmentation.ipynb --output executed.ipynb --ExecutePreprocessor.timeout=5400
+      - uses: actions/upload-artifact@v4
+        with:
+          name: executed-notebook
+          path: executed.ipynb
